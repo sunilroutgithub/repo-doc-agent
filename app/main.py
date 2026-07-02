@@ -1,1 +1,1 @@
-# Added docstrings to main.py functions and classes
+# Updated content with docstrings
