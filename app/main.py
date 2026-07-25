@@ -70,6 +70,10 @@ Branch to write to: {branch_name}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/")
+def root():
+    return {"status": "ok", "service": "Repo Doc Agent"}
+
 @app.get("/health")
 def health():
     return {"status": "healthy", "target_repo": settings.TARGET_REPO}
