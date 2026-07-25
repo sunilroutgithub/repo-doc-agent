@@ -4,7 +4,7 @@ from app.config import settings
 
 @tool
 def read_file(repo_path: str, file_path: str) -> str:
-    """Read a file from the target GitHub repository."""
+    """Read a file from a GitHub repository. repo_path must be 'owner/repo' (e.g. 'sunilroutgithub/rag-document-qa'). file_path is the path within the repo (e.g. 'app/main.py')."""
     client = GitHubClient()
     repo = client.get_repo(repo_path)
     try:

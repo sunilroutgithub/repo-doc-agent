@@ -42,12 +42,13 @@ def generate_docs(request: DocRequest):
                 ("system", SYSTEM_PROMPT),
                 ("user", f"""
 Task: 
-1. Read file {request.file_path} from branch main
+1. Read file {request.file_path} from repo {request.repo_path} (branch main)
 2. Add docstrings to all functions and classes
 3. Generate pytest unit tests for all functions and classes
 4. Write the updated content to branch {branch_name}
 5. Create a pull request from {branch_name} to main
 
+Repo: {request.repo_path}
 File path: {request.file_path}
 Branch to write to: {branch_name}
 """)
