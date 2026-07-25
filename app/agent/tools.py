@@ -6,9 +6,9 @@ from app.config import settings
 def read_file(repo_path: str, file_path: str) -> str:
     """Read a file from the target GitHub repository."""
     client = GitHubClient()
-    repo = client.get_repo()
+    repo = client.get_repo(repo_path)
     try:
-        content = repo.get_contents(file_path, ref=repo_path)
+        content = repo.get_contents(file_path)
         return content.decoded_content.decode("utf-8")
     except Exception as e:
         return f"Error reading file: {str(e)}"

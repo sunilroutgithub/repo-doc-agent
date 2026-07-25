@@ -1,12 +1,12 @@
-﻿from github import Github
+from github import Github
 from app.config import settings
 
 class GitHubClient:
     def __init__(self):
         self.client = Github(settings.GITHUB_TOKEN)
     
-    def get_repo(self):
-        return self.client.get_repo(settings.TARGET_REPO)
+    def get_repo(self, repo_path: str = None):
+        return self.client.get_repo(repo_path or settings.TARGET_REPO)
     
     def create_branch(self, repo, branch_name, base="main"):
         base_ref = repo.get_branch(base)

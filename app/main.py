@@ -27,7 +27,7 @@ def generate_docs(request: DocRequest):
         # First, create the branch
         from app.github_client import GitHubClient
         client = GitHubClient()
-        repo = client.get_repo()
+        repo = client.get_repo(request.repo_path)
         
         # Create branch from main
         main_ref = repo.get_branch("main")
