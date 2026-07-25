@@ -1,21 +1,16 @@
 from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
-from app.agent.tools import read_file, write_file_and_commit
-from app.agent.prompts import SYSTEM_PROMPT
+from app.agent.tools import make_write_file_tool
 from app.config import settings
 
-def create_doc_agent():
+
+def create_doc_agent(repo_path: str):
     llm = ChatGroq(
-        model="llama-3.1-8b-instant",  # Changed to smaller model
+        model="llama-3.1-8b-instant",
         api_key=settings.GROQ_API_KEY,
-        temperature=0.2
+        temperature=0.2,
     )
-    
-    tools = [read_file, write_file_and_commit]
-    
-    agent = create_react_agent(
-        model=llm,
-        tools=tools,
-    )
-    
-    return agent
+
+    tools = [make_write_file_tool(repo_path)]
+
+    return create_react_agent(model=llm, tools=tools)

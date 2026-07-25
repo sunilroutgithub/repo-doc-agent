@@ -1,59 +1,36 @@
 from langchain.tools import tool
 from app.github_client import GitHubClient
-from app.config import settings
 
-@tool
-def read_file(repo_path: str, file_path: str) -> str:
-    """Read a file from a GitHub repository. repo_path must be 'owner/repo' (e.g. 'sunilroutgithub/rag-document-qa'). file_path is the path within the repo (e.g. 'app/main.py')."""
-    client = GitHubClient()
-    repo = client.get_repo(repo_path)
-    try:
-        content = repo.get_contents(file_path)
-        return content.decoded_content.decode("utf-8")
-    except Exception as e:
-        return f"Error reading file: {str(e)}"
 
-@tool
-def create_pull_request(branch_name: str, title: str, body: str) -> str:
-    """Create a pull request from a branch."""
-    client = GitHubClient()
-    repo = client.get_repo()
-    try:
-        pr = repo.create_pull(
-            title=title,
-            body=body,
-            head=branch_name,
-            base="main"
-        )
-        return f"PR created: {pr.html_url}"
-    except Exception as e:
-        return f"Error creating PR: {str(e)}"
+def make_write_file_tool(repo_path: str):
+    """Return a write_file_and_commit tool with repo_path hardcoded via closure."""
 
-@tool
-def write_file_and_commit(branch: str, path: str, content: str, commit_msg: str) -> str:
-    """Write content to a file and commit it to a branch."""
-    client = GitHubClient()
-    repo = client.get_repo()
-    
-    try:
-        # Check if branch exists, if not create it
+    @tool
+    def write_file_and_commit(branch: str, path: str, content: str, commit_msg: str) -> str:
+        """Write content to a file and commit it to a branch. Arguments: branch (the branch name to write to), path (file path in the repo), content (full file content), commit_msg (commit message)."""
+        client = GitHubClient()
+        repo = client.get_repo(repo_path)  # repo_path from closure — not from LLM
+
         try:
-            repo.get_branch(branch)
-        except:
-            # Create branch from main
-            main_ref = repo.get_branch("main")
-            repo.create_git_ref(
-                ref=f"refs/heads/{branch}",
-                sha=main_ref.commit.sha
-            )
-        
-        # Try to update existing file or create new one
-        try:
-            file = repo.get_contents(path, ref=branch)
-            repo.update_file(path, commit_msg, content, file.sha, branch=branch)
-        except:
-            repo.create_file(path, commit_msg, content, branch=branch)
-        
-        return f"File {path} updated on branch {branch}"
-    except Exception as e:
-        return f"Error writing file: {str(e)}"
+            # Ensure branch exists
+            try:
+                repo.get_branch(branch)
+            except Exception:
+                main_ref = repo.get_branch(repo.default_branch)
+                repo.create_git_ref(
+                    ref=f"refs/heads/{branch}",
+                    sha=main_ref.commit.sha,
+                )
+
+            # Update existing file or create new one
+            try:
+                existing = repo.get_contents(path, ref=branch)
+                repo.update_file(path, commit_msg, content, existing.sha, branch=branch)
+            except Exception:
+                repo.create_file(path, commit_msg, content, branch=branch)
+
+            return f"File {path} written to branch {branch}"
+        except Exception as e:
+            return f"Error writing file: {str(e)}"
+
+    return write_file_and_commit
