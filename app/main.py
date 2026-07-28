@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from app.agent.react_agent import create_doc_agent
-from app.agent.prompts import SYSTEM_PROMPT
+from app.agent.crew import run_doc_crew
 from app.github_client import GitHubClient
 from app.config import settings
 import time
@@ -37,23 +36,20 @@ def generate_docs(request: DocRequest):
             sha=default_ref.commit.sha,
         )
 
-        # Agent only needs to: generate docstrings/tests, write the file.
-        # repo_path is bound into the write tool via closure — the LLM never sees it.
-        agent = create_doc_agent(request.repo_path)
-        agent.invoke({
-            "messages": [
-                ("system", SYSTEM_PROMPT),
-                ("user", f"""Here is the content of {request.file_path}:
 
-{file_content}
+                       # Multi-agent crew (Writer -> Reviewer -> Editor) generates the final file content
+        final_content = run_doc_crew(request.file_path, file_content)
 
-Task:
-1. Add Google-style docstrings to all functions and classes that are missing them
-2. Generate pytest unit tests for all functions and classes
-3. Write the complete updated file to path "{request.file_path}" on branch "{branch_name}" with a clear commit message
-"""),
-            ]
-        })
+        # Write the crew's final output to the branch — deterministic, not LLM tool call
+        from app.agent.tools import make_write_file_tool
+        write_tool = make_write_file_tool(request.repo_path)
+        write_tool.func(
+            branch=branch_name,
+            path=request.file_path,
+            content=final_content,
+            commit_msg=f"Add docstrings and tests to {request.file_path} (multi-agent crew)",
+        )
+
 
         # Open the PR in Python — not via the LLM
         pr = repo.create_pull(
