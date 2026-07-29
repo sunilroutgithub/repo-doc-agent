@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+```python
+from langchain.tools import tool
+from app.github_client import GitHubClient
+=======
 # from langchain.tools import tool
 # from app.github_client import GitHubClient
 
@@ -34,6 +39,7 @@
 #             return f"Error writing file: {str(e)}"
 
 #     return write_file_and_commit
+
 
 
 from langchain.tools import tool
