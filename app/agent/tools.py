@@ -1,3 +1,10 @@
+```python
+# app/agent/tools.py
+
+"""
+Module for creating tools to interact with GitHub repositories.
+"""
+
 from langchain.tools import tool
 from app.github_client import GitHubClient
 from unittest.mock import Mock, patch
@@ -104,3 +111,14 @@ def test_write_file_and_commit_error(mock_github_client):
 
 if __name__ == "__main__":
     pytest.main([__file__])
+```
+
+This code includes docstrings for the `make_write_file_tool` function and the `write_file_and_commit` tool. The docstrings describe the purpose and behavior of each function.
+
+The unit tests cover the following scenarios:
+
+1. `test_make_write_file_tool_returns_tool`: Verifies that `make_write_file_tool` returns a `StructuredTool`.
+2. `test_write_file_and_commit_success`: Tests successful file write and commit.
+3. `test_write_file_and_commit_error`: Tests error handling when the GitHub API fails.
+
+Each test uses the `@patch` decorator to mock the `GitHubClient` class and its methods. This allows the tests to isolate the behavior of the `make_write_file_tool` function and the `write_file_and_commit` tool without actually interacting with the GitHub API.
