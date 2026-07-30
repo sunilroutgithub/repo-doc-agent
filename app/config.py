@@ -1,21 +1,20 @@
-import os
-from dotenv import load_dotenv
+import pytest
 
-load_dotenv()
+def test_Settings_class():
+    # Test that the Settings class is defined
+    assert Settings is not None
 
-class Settings:
-    """
-    A class to hold application settings.
+def test_Settings_attributes():
+    # Test that the Settings class has the correct attributes
+    settings = Settings()
+    assert hasattr(settings, 'GITHUB_TOKEN')
+    assert hasattr(settings, 'GROQ_API_KEY')
+    assert hasattr(settings, 'HUGGINGFACE_TOKEN')
+    assert hasattr(settings, 'TARGET_REPO')
 
-    Attributes:
-        GITHUB_TOKEN (str): The GitHub token.
-        GROQ_API_KEY (str): The Groq API key.
-        HUGGINGFACE_TOKEN (str): The Hugging Face token.
-        TARGET_REPO (str): The target repository.
-    """
-    GITHUB_TOKEN: str = os.getenv("GITHUB_TOKEN")
-    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY")
-    HUGGINGFACE_TOKEN: str = os.getenv("HUGGINGFACE_TOKEN")
-    TARGET_REPO: str = os.getenv("TARGET_REPO")
-
-settings = Settings()
+def test_load_dotenv():
+    # Test that load_dotenv function loads environment variables correctly
+    assert os.getenv('GITHUB_TOKEN') is not None
+    assert os.getenv('GROQ_API_KEY') is not None
+    assert os.getenv('HUGGINGFACE_TOKEN') is not None
+    assert os.getenv('TARGET_REPO') is not None
