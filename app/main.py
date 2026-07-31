@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from app.agent.crew import run_doc_crew
 from app.github_client import GitHubClient
 from app.config import settings
 import time
@@ -37,7 +36,10 @@ def generate_docs(request: DocRequest):
         )
 
 
-                       # Multi-agent crew (Writer -> Reviewer -> Editor) generates the final file content
+                       # Lazy import — crewai/torch/sentence-transformers load on first request, not at startup
+        from app.agent.crew import run_doc_crew
+
+        # Multi-agent crew (Writer -> Reviewer -> Editor) generates the final file content
         final_content = run_doc_crew(request.file_path, file_content)
 
         # Write the crew's final output to the branch — deterministic, not LLM tool call
