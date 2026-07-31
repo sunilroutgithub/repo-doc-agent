@@ -1,0 +1,1 @@
+- [chromadb firewall stub](chromadb-firewall-stub.md) — chromadb is blocked by Replit's package firewall; a local pip-installable stub in stubs/chromadb/ satisfies crewai's dependency without hitting the firewall.

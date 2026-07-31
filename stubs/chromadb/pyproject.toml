@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chromadb"
+version = "1.1.1"
+description = "Chromadb stub — satisfies crewai dependency without the real package"
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["src"]
