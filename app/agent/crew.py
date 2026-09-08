@@ -1,18 +1,25 @@
-import crewai.llms.cache as _crewai_cache
-# crewai stamps {"cache_breakpoint": True} onto every message for Anthropic
-# prompt-caching, but _format_messages_for_provider (llm.py:2355) only strips
-# it for Anthropic models — every other provider, including Groq, receives the
-# field verbatim, and Groq's API rejects it ("property 'cache_breakpoint' is
-# unsupported").  The import inside _setup_messages is a runtime import (inside
-# the function body), so patching the module attribute here is enough.
-_crewai_cache.mark_cache_breakpoint = lambda msg: msg
-
 from crewai import Agent, Task, Crew, Process
 from crewai.llm import LLM
 from app.config import settings
 
+
+class GroqLLM(LLM):
+    """CrewAI LLM adapter that removes Anthropic-only cache markers for Groq."""
+
+    def _format_messages_for_provider(self, messages):
+        formatted_messages = super()._format_messages_for_provider(messages)
+        return [
+            {
+                key: value
+                for key, value in message.items()
+                if key != "cache_breakpoint"
+            }
+            for message in formatted_messages
+        ]
+
+
 def build_llm():
-    return LLM(
+    return GroqLLM(
         model="groq/llama-3.1-8b-instant",
         api_key=settings.GROQ_API_KEY,
         temperature=0.2,

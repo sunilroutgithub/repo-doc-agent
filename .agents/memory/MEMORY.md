@@ -1,1 +1,2 @@
 - [chromadb firewall stub](chromadb-firewall-stub.md) — chromadb is blocked by Replit's package firewall; a local pip-installable stub in stubs/chromadb/ satisfies crewai's dependency without hitting the firewall.
+- [CrewAI provider markers](crewai-provider-markers.md) — strip CrewAI's Anthropic cache markers at the provider boundary for Groq; disabling the marker at creation was not sufficient.
