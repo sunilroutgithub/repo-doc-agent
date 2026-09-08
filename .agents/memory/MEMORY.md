@@ -2,3 +2,4 @@
 - [CrewAI provider markers](crewai-provider-markers.md) — strip CrewAI's Anthropic cache markers at the provider boundary for Groq; disabling the marker at creation was not sufficient.
 - [GitHub 404 diagnostics](github-404-diagnostics.md) — PyGithub 404s can mean a missing file or inaccessible private repo; identify the failing operation before changing token scopes.
 - [Verify published build](verify-published-build.md) — compare a safe live endpoint such as `/openapi.json` with current source before diagnosing runtime behavior.
+- [Deployment artifact size](deployment-artifact-size.md) — direct Torch/sentence-transformers pins can create multi-gigabyte Replit layers and prevent Autoscale promotion.

@@ -2,6 +2,7 @@ modules = ["python-3.12"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["cacert", "cargo", "glibcLocales", "libffi", "libiconv", "libxcrypt", "openssl", "pkg-config", "rustc", "xcodebuild", "zlib"]
 
 [agent]
 expertMode = true
