@@ -66,6 +66,7 @@ class Settings:
 # Tests
 # ---------------------------------------------------------------------------
 
+
 def test_settings_init() -> None:
     """Verify that :class:`Settings` can be instantiated when all env vars are set.
 
