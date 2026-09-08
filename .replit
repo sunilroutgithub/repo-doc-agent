@@ -9,7 +9,7 @@ expertMode = true
 [userenv]
 
 [userenv.shared]
-TARGET_REPO = "Sunil9938/Weather-App"
+TARGET_REPO = "sunilroutgithub/repo-doc-agent"
 
 [workflows]
 runButton = "Project"
