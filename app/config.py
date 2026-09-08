@@ -1,55 +1,87 @@
+"""Application configuration module.
+
+This module loads environment variables using :func:`dotenv.load_dotenv` and
+provides a :class:`Settings` class that exposes the required configuration
+values as attributes.  The module also contains a small test suite that can be
+run with ``pytest`` to verify that the settings are loaded correctly.
+
+The tests are intentionally lightweight and only check that the environment
+variables are present and that the :class:`Settings` constructor raises a
+:class:`ValueError` when any required variable is missing.
+"""
+
 import os
 from dotenv import load_dotenv
 import pytest
 
+# Load environment variables from a .env file if present.
 load_dotenv()
 
+
 class Settings:
+    """Container for application configuration.
+
+    The class reads the following environment variables on instantiation:
+
+    ``GITHUB_TOKEN``
+        GitHub personal access token used for API requests.
+
+    ``GROQ_API_KEY``
+        API key for the GROQ service.
+
+    ``HUGGINGFACE_TOKEN``
+        Hugging Face authentication token.
+
+    ``TARGET_REPO``
+        The GitHub repository (``owner/repo``) that the application will
+        interact with.
+
+    Raises
+    ------
+    ValueError
+        If any of the required environment variables are missing.
     """
-    A class to hold application settings.
 
-    Attributes:
-        GITHUB_TOKEN (str): The GitHub token for API access.
-        GROQ_API_KEY (str): The GROQ API key for data access.
-        HUGGINGFACE_TOKEN (str): The Hugging Face token for API access.
-        TARGET_REPO (str): The target repository for GitHub API access.
-    """
+    def __init__(self) -> None:
+        """Read required environment variables.
 
-    def __init__(self):
+        The constructor pulls the values from :mod:`os.environ`.  If any of
+        the variables are not set, a :class:`ValueError` is raised.
         """
-        Initializes the Settings class.
+        self.GITHUB_TOKEN: str | None = os.getenv("GITHUB_TOKEN")
+        self.GROQ_API_KEY: str | None = os.getenv("GROQ_API_KEY")
+        self.HUGGINGFACE_TOKEN: str | None = os.getenv("HUGGINGFACE_TOKEN")
+        self.TARGET_REPO: str | None = os.getenv("TARGET_REPO")
 
-        Raises:
-            ValueError: If any environment variable is not set.
-        """
-        self.GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-        self.GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-        self.HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
-        self.TARGET_REPO = os.getenv("TARGET_REPO")
-
-        if not all([self.GITHUB_TOKEN, self.GROQ_API_KEY, self.HUGGINGFACE_TOKEN, self.TARGET_REPO]):
+        if not all([
+            self.GITHUB_TOKEN,
+            self.GROQ_API_KEY,
+            self.HUGGINGFACE_TOKEN,
+            self.TARGET_REPO,
+        ]):
             raise ValueError("One or more environment variables are not set.")
 
 
-def test_settings_init():
-    """
-    Tests the Settings class initialization.
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
 
-    Raises:
-        ValueError: If the test fails.
+def test_settings_init() -> None:
+    """Verify that :class:`Settings` can be instantiated when all env vars are set.
+
+    The test simply constructs a :class:`Settings` instance and ensures that no
+    exception is raised.
     """
     try:
-        settings = Settings()
+        Settings()
     except ValueError as e:
         pytest.fail(str(e))
 
 
-def test_settings_attributes():
-    """
-    Tests the Settings class attributes.
+def test_settings_attributes() -> None:
+    """Check that the attributes of :class:`Settings` are truthy.
 
-    Raises:
-        AssertionError: If any attribute is not set correctly.
+    The test asserts that each attribute is set to a non‑empty string.
     """
     settings = Settings()
     assert settings.GITHUB_TOKEN
@@ -58,12 +90,11 @@ def test_settings_attributes():
     assert settings.TARGET_REPO
 
 
-def test_settings_env_vars():
-    """
-    Tests the Settings class environment variables.
+def test_settings_env_vars() -> None:
+    """Ensure that the attributes match the values in :mod:`os.environ`.
 
-    Raises:
-        AssertionError: If any environment variable is not set correctly.
+    This test compares each attribute to the corresponding environment
+    variable to confirm that the values are read correctly.
     """
     settings = Settings()
     assert os.getenv("GITHUB_TOKEN") == settings.GITHUB_TOKEN
@@ -71,4 +102,21 @@ def test_settings_env_vars():
     assert os.getenv("HUGGINGFACE_TOKEN") == settings.HUGGINGFACE_TOKEN
     assert os.getenv("TARGET_REPO") == settings.TARGET_REPO
 
+
+def test_settings_missing_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify that a missing environment variable triggers a :class:`ValueError`.
+
+    The test temporarily removes ``GITHUB_TOKEN`` from the environment and
+    asserts that constructing :class:`Settings` raises a :class:`ValueError`.
+    """
+    # Preserve original value
+    original_token = os.getenv("GITHUB_TOKEN")
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    with pytest.raises(ValueError):
+        Settings()
+    # Restore original value for any subsequent tests
+    if original_token is not None:
+        monkeypatch.setenv("GITHUB_TOKEN", original_token)
+
+# Instantiate a Settings object for potential use in other modules.
 settings = Settings()
