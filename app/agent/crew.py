@@ -4,7 +4,7 @@ from app.config import settings
 
 def build_llm():
     return LLM(
-        model="groq/llama-3.1-8b-instant",
+        model="groq/openai/gpt-oss-20b",  # ← CORRECT FORMAT!
         api_key=settings.GROQ_API_KEY,
         temperature=0.2,
     )
