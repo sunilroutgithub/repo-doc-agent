@@ -2,25 +2,9 @@ from crewai import Agent, Task, Crew, Process
 from crewai.llm import LLM
 from app.config import settings
 
-
-class GroqLLM(LLM):
-    """CrewAI LLM adapter that removes Anthropic-only cache markers for Groq."""
-
-    def _format_messages_for_provider(self, messages):
-        formatted_messages = super()._format_messages_for_provider(messages)
-        return [
-            {
-                key: value
-                for key, value in message.items()
-                if key != "cache_breakpoint"
-            }
-            for message in formatted_messages
-        ]
-
-
 def build_llm():
-    return GroqLLM(
-        model="groq/llama-3.1-8b-instant",
+    return LLM(
+        model="groq/openai/gpt-oss-20b",  # ← CORRECT FORMAT!
         api_key=settings.GROQ_API_KEY,
         temperature=0.2,
     )
